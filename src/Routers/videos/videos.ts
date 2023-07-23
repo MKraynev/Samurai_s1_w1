@@ -10,6 +10,7 @@ import { type } from "os";
 export const videosRouter = Router();
 
 export const NODE_VIDEO_PATH = "/hometask_01/api/videos"
+export const NODE_PRE_VIDEO_PATH = "/hometask_01/api"
 
 type PostBodyData = {
     title: string,
@@ -152,7 +153,7 @@ videosRouter.delete(NODE_VIDEO_PATH + '/:id', (request: RequestWithParams<{ id: 
 })
 
 
-videosRouter.delete(NODE_VIDEO_PATH.substring(0, 17) + "/testing/all-data", (request: Request, response: Response) => {
+videosRouter.delete(NODE_PRE_VIDEO_PATH + "/testing/all-data", (request: Request, response: Response) => {
     Repo.length = 0;
     response.send(204);
 })
