@@ -28,8 +28,8 @@ let Repo: VideoType[] = [
         id: 0,
         title: "Batman",
         author: "Nolan",
-        canBeDownloaded: true,
-        minAgeRestriction: 14,
+        canBeDownloaded: false,
+        minAgeRestriction: null,
         createdAt: "2005-06-15T15:52:59.025Z",
         publicationDate: "2005-06-16T15:52:59.025Z",
         availableResolutions: [Resolutions.P720, Resolutions.P1080]
@@ -83,7 +83,7 @@ videosRouter.post(NODE_VIDEO_PATH, (request: RequestWithBody<PostBodyData>, resp
     const newVideoObject: VideoType = {
         ...requestData,
         id: +(new Date()),
-        canBeDownloaded: true,
+        canBeDownloaded: false,
         minAgeRestriction: null,
         createdAt: createdAt.toISOString(),
         publicationDate: publicationDate.toISOString()
@@ -162,7 +162,7 @@ videosRouter.delete(NODE_VIDEO_PATH + '/:id', (request: RequestWithParams<{ id: 
 })
 
 
-videosRouter.delete("/ht_01/api/testing/all-data", (request: Request, response: Response) => {
+videosRouter.delete(NODE_VIDEO_PATH + "/testing/all-data", (request: Request, response: Response) => {
     Repo.length = 0;
     response.send(204);
 })
@@ -187,12 +187,12 @@ const FindErrors = (data: PostBodyData | PutBodyData): ErrorMessages => {
     }
     //Resolutions
     if (!Array.isArray(data.availableResolutions) || data.availableResolutions.length === 0) {
-        foundErrorMessages.errorsMessages.push({ message: "Invalid resolution value", field: "availableResolution" })
+        foundErrorMessages.errorsMessages.push({ message: "Invalid resolution value", field: "availableResolutions" })
     }
     else {
         data.availableResolutions.forEach(resolution => {
             if (!Object.values(Resolutions).includes(resolution)) {
-                foundErrorMessages.errorsMessages.push({ message: "Wrong resolution value", field: "availableResolution" })
+                foundErrorMessages.errorsMessages.push({ message: "Wrong resolution value", field: "availableResolutions" })
             }
         })
     }
@@ -209,7 +209,7 @@ const FindErrors = (data: PostBodyData | PutBodyData): ErrorMessages => {
 
         //minAgeRestriction - проверка что number/проверка валидности значения
         if (!((typeResult = typeof data.minAgeRestriction) === 'number')) {
-            foundErrorMessages.errorsMessages.push({ message: 'Invalid type of field: ${typeResult}. Expect: number', field: "minAgeRestriction" })
+            foundErrorMessages.errorsMessages.push({ message: 'Invalid type of field: ' + typeResult + '. Expect: number', field: "minAgeRestriction" })
         }
         else {
             //Это число - проверка на валидность значения
@@ -221,7 +221,7 @@ const FindErrors = (data: PostBodyData | PutBodyData): ErrorMessages => {
 
         //publicationDate - проверка что string
         if (!((typeResult = typeof data.publicationDate) === 'string')) {
-            foundErrorMessages.errorsMessages.push({ message: 'Invalid type of field: ${typeResult}. Expect: string', field: "minAgeRestriction" })
+            foundErrorMessages.errorsMessages.push({ message: 'Invalid type of field: ' + typeResult + '. Expect: string', field: "publicationDate" })
         }
         else {
             //publicationDate - проверка валидный формат

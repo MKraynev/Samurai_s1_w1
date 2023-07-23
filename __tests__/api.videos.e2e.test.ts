@@ -59,7 +59,7 @@ describe("/videos", () => {
                 title: "Hobbit",
                 author: "Tolkien",
                 availableResolutions: ["P144"],
-                canBeDownloaded: true,
+                canBeDownloaded: false,
                 minAgeRestriction: null,
                 createdAt: expect.any(String),
                 publicationDate: expect.any(String)
