@@ -3,7 +3,7 @@
     "name": "Practice",
     "builds": [
         {
-            "src": "src/index.tx",
+            "src": "src/index.ts",
             "use": "@vercel/node"
         }
     ],
