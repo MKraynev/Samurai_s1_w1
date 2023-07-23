@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "name": "Practice",
+    "builds": [
+        {
+            "src": "src/index.tx",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "src/index.ts"
+        }
+    ]
+}
