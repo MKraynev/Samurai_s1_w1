@@ -23,19 +23,9 @@ type PutBodyData = PostBodyData & {
     publicationDate: string
 }
 
-let Repo: VideoType[] = [
-    {
-        id: 0,
-        title: "Batman",
-        author: "Nolan",
-        canBeDownloaded: false,
-        minAgeRestriction: null,
-        createdAt: "2005-06-15T15:52:59.025Z",
-        publicationDate: "2005-06-16T15:52:59.025Z",
-        availableResolutions: [Resolutions.P720, Resolutions.P1080]
+let Repo: VideoType[] = [];
 
-    }
-]
+
 
 
 //GET
@@ -162,7 +152,7 @@ videosRouter.delete(NODE_VIDEO_PATH + '/:id', (request: RequestWithParams<{ id: 
 })
 
 
-videosRouter.delete(NODE_VIDEO_PATH + "/testing/all-data", (request: Request, response: Response) => {
+videosRouter.delete(NODE_VIDEO_PATH.substring(0, 17) + "/testing/all-data", (request: Request, response: Response) => {
     Repo.length = 0;
     response.send(204);
 })
