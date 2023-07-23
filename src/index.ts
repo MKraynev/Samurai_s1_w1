@@ -5,7 +5,7 @@ import { videosRouter } from "./Routers/videos/videos";
 //2) объявляем объект приложения из метода
 export const app = express();
 //Определяем порт
-const PORT: number = 5000;
+const PORT: number = 5001;
 //Задаем возможность юзать body
 app.use(express.json());
 
