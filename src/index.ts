@@ -16,3 +16,5 @@ app.use(videosRouter);
 app.listen(PORT, () => {
     console.log("App running");
 })
+
+console.log("push check")
