@@ -1,6 +1,6 @@
 import request from "supertest"
 import { app } from "../src"
-import { NODE_VIDEO_PATH } from "../src/Routers/videos/videos"
+import { NODE_VIDEO_PATH, NODE_PRE_VIDEO_PATH } from "../src/Routers/videos/videos"
 import { Resolutions } from "../src/Types/Resolutions"
 
 describe("/videos", () => {
@@ -8,31 +8,13 @@ describe("/videos", () => {
         let response = await request(app).get(NODE_VIDEO_PATH).expect(200)
         let responseObject = response.body;
 
-        expect(responseObject).toEqual([{
-            id: 0,
-            title: "Batman",
-            author: "Nolan",
-            canBeDownloaded: true,
-            minAgeRestriction: 14,
-            createdAt: "2005-06-15T15:52:59.025Z",
-            publicationDate: "2005-06-16T15:52:59.025Z",
-            availableResolutions: [Resolutions.P720, Resolutions.P1080]
-        }])
+        expect(responseObject).toEqual([])
     })
 
-    it("GET 200 BY ID", async () => {
-        let response = await request(app).get(NODE_VIDEO_PATH + "/0").expect(200)
+    it("GET 404 BY ID", async () => {
+        let response = await request(app).get(NODE_VIDEO_PATH + "/0").expect(404)
 
-        expect(response.body).toEqual({
-            id: 0,
-            title: "Batman",
-            author: "Nolan",
-            canBeDownloaded: true,
-            minAgeRestriction: 14,
-            createdAt: "2005-06-15T15:52:59.025Z",
-            publicationDate: "2005-06-16T15:52:59.025Z",
-            availableResolutions: [Resolutions.P720, Resolutions.P1080]
-        })
+        expect(response.body).toEqual({})
     })
 
     it("GET 404 WRONG ID", async () => {
@@ -170,10 +152,28 @@ describe("/videos", () => {
             }]
         })
     })
+    let objectId: number;
+    let objectAdr: string;
 
     it("PUT 204_NO_CONTENT AND GET_200 CONTAIN NEW DATA", async () => {
-        await request(app)
-            .put(NODE_VIDEO_PATH + "/0")
+        //Добавляем новый объект
+        let response = await request(app)
+            .post(NODE_VIDEO_PATH)
+            .send({
+                title: "Hobbit_2",
+                author: "Tolkien_2",
+                availableResolutions: ["P144"]
+            })
+            .expect(201);
+
+        let savedValue = response.body;
+
+        objectAdr = NODE_VIDEO_PATH + "/" + String(response.body.id);
+        objectId = response.body.id;
+
+
+        response = await request(app)
+            .put(objectAdr)
             .send({
                 title: "Batman_2",
                 author: "Nolan_2",
@@ -184,17 +184,17 @@ describe("/videos", () => {
             })
             .expect(204)
 
-        let response = await request(app)
-            .get(NODE_VIDEO_PATH + "/0")
+        response = await request(app)
+            .get(objectAdr)
             .expect(200)
 
         expect(response.body).toEqual({
-            id: 0,
+            id: objectId,
             title: "Batman_2",
             author: "Nolan_2",
             canBeDownloaded: false,
             minAgeRestriction: 17,
-            createdAt: "2005-06-15T15:52:59.025Z",
+            createdAt: expect.any(String),
             publicationDate: "2006-06-16T15:52:59.025Z",
             availableResolutions: [Resolutions.P360, Resolutions.P2160]
         });
@@ -203,7 +203,7 @@ describe("/videos", () => {
 
     it("PUT 400 WRONG TITLE", async () => {
         await request(app)
-            .put(NODE_VIDEO_PATH + "/0")
+            .put(objectAdr)
             .send({
                 title: "",
                 author: "Nolan_2",
@@ -216,7 +216,7 @@ describe("/videos", () => {
     })
     it("PUT 400 WRONG AUTHOR", async () => {
         await request(app)
-            .put(NODE_VIDEO_PATH + "/0")
+            .put(objectAdr)
             .send({
                 title: "Batman",
                 author: 5,
@@ -229,7 +229,7 @@ describe("/videos", () => {
     })
     it("PUT 400 WRONG RESOLUTION", async () => {
         await request(app)
-            .put(NODE_VIDEO_PATH + "/0")
+            .put(objectAdr)
             .send({
                 title: "Batman",
                 author: "Nolan",
@@ -242,7 +242,7 @@ describe("/videos", () => {
     })
     it("PUT 400 WRONG CAN_BE_DOWNLOADED", async () => {
         await request(app)
-            .put(NODE_VIDEO_PATH + "/0")
+            .put(objectAdr)
             .send({
                 title: "Batman",
                 author: "Nolan",
@@ -255,7 +255,7 @@ describe("/videos", () => {
     })
     it("PUT 400 WRONG MIN_AGE", async () => {
         await request(app)
-            .put(NODE_VIDEO_PATH + "/0")
+            .put(objectAdr)
             .send({
                 title: "Batman",
                 author: "Nolan",
@@ -268,7 +268,7 @@ describe("/videos", () => {
     })
     it("PUT 400 WRONG PUBLICATION_DATE", async () => {
         await request(app)
-            .put(NODE_VIDEO_PATH + "/0")
+            .put(objectAdr)
             .send({
                 title: "Batman",
                 author: "Nolan",
@@ -281,8 +281,8 @@ describe("/videos", () => {
     })
 
     it("DELETE 204 GET_BY_ID_404", async () => {
-        await request(app).delete(NODE_VIDEO_PATH + "/0").expect(204);
-        await request(app).get(NODE_VIDEO_PATH + "/0").expect(404);
+        await request(app).delete(objectAdr).expect(204);
+        await request(app).get(objectAdr).expect(404);
     })
 
     it("DELETE_ALL 204", async () => {
@@ -312,10 +312,10 @@ describe("/videos", () => {
                 availableResolutions: ["P1080"]
             })
             .expect(201);
-        let response = await (app).get(NODE_VIDEO_PATH).expect(200);
+        let response = await request(app).get(NODE_VIDEO_PATH).expect(200);
         expect(response.body.length >= 3).toBe(true);
 
-        await request(app).delete("/ht_01/api/testing/all-data").expect(204);
+        await request(app).delete(NODE_PRE_VIDEO_PATH + "/testing/all-data").expect(204);
         response = await request(app).get(NODE_VIDEO_PATH).expect(200);
         expect(response.body).toEqual([]);
     })
